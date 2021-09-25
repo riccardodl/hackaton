@@ -72,6 +72,7 @@ def _get_q_and_as_from_pdf(path_pdf):
                     i += 1
                 
                 q_and_as = [(qa[0], "\n".join(qa[1])) for qa in q_and_as]
+                q_and_as = [qa for qa in q_and_as if len(qa[0]) < len(qa[1])]
                 return json.dumps({
                     'preface': preface,
                     'qs_and_as': q_and_as
@@ -130,7 +131,9 @@ def _tests():
             print("Preface:\n", obj['preface'])
             for qa in obj['qs_and_as']:
                 print("Q: ", qa[0])
+                print('-------')
                 print("A: ", qa[1])
+                print('*************************')
             with open('/Users/raulcatena/Desktop/ej.json', 'w') as wr:
                 wr.write(d)
 
