@@ -16,7 +16,6 @@ class Database(object):
         with open('database.csv', newline='') as file:
             data = csv.reader(file)
             for row in data:
-                #elem = row[0].split(',', 4)
                 if row[1] == drug_name:
                     return row[3]
     
@@ -30,5 +29,8 @@ class Database(object):
         return None
 
     @classmethod
-    def pdf_to_json(self, pdf):
-        return 'json'
+    def pdf_to_json(self, pdf):        
+        data = pdf.decode('utf8')
+        # Convert
+        return f'{data}_but_in_json'
+        

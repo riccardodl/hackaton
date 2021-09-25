@@ -16,11 +16,14 @@ def get_json(barcode):
 @app.route("/put/<drug>", methods=['PUT'])
 def put_json(drug):
     qr_code = request.form['qr_code']
-    #pdf = request.files['pdf'] uncomment once we send a pdf file in the request
+    #pdf = request.get_data()
+    pdf = request.files['file'] #uncomment once we send a pdf file in the request    
+    length = int(request.headers["Content-Length"])
+    pdf_data = pdf.stream.read(length)
 
     db_handler = Database()
     id = db_handler.get_next_id()
-    db_handler.put_entry(id, drug, qr_code, 'pdf')
+    db_handler.put_entry(id, drug, qr_code, pdf_data)
     return 'Success'
 
 
