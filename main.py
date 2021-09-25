@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import request
 from .database import Database
+from .pdf_parser.pdf_parser import *
+import json
 
 app = Flask(__name__)
 
@@ -16,14 +18,16 @@ def get_json(barcode):
 @app.route("/put/<drug>", methods=['PUT'])
 def put_json(drug):
     qr_code = request.form['qr_code']
-    #pdf = request.get_data()
-    pdf = request.files['file'] #uncomment once we send a pdf file in the request    
-    length = int(request.headers["Content-Length"])
-    pdf_data = pdf.stream.read(length)
+    url = request.form['pdf_url']
+
+    data = parse_pdf_prospect(url, False)  
+    #data = raw.decode('utf-8')
+    data = data.replace('\r','').replace('\n','<br />') 
+
 
     db_handler = Database()
     id = db_handler.get_next_id()
-    db_handler.put_entry(id, drug, qr_code, pdf_data)
+    db_handler.put_entry(id, drug, qr_code, data)
     return 'Success'
 
 
