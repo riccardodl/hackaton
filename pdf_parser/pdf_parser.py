@@ -9,10 +9,10 @@ from borb.pdf.pdf import PDF
 from borb.toolkit.text.simple_text_extraction import SimpleTextExtraction
 
 
-def download_file(download_url):
+def _download_file(download_url):
     base_name = os.path.basename(download_url)
     response = urllib.request.urlopen(download_url)    
-    file_name = os.path.join(get_tmp_folder(), base_name + ("" if base_name.endswith('.pdf') else ".pdf"))
+    file_name = os.path.join(_get_tmp_folder(), base_name + ("" if base_name.endswith('.pdf') else ".pdf"))
     try:
         with open(file_name, 'wb') as f:
             f.write(response.read())
@@ -20,11 +20,11 @@ def download_file(download_url):
     except:
         return None
 
-def get_tmp_folder():
+def _get_tmp_folder():
     return tempfile.gettempdir()
 
 
-def get_raw_text_from_pdf(path_pdf):
+def _get_raw_text_from_pdf(path_pdf):
         
     try:
         extractor = SimpleTextExtraction()
@@ -46,7 +46,7 @@ def get_raw_text_from_pdf(path_pdf):
 
     return None
 
-def get_json_text_from_pdf(path_pdf):
+def _get_json_text_from_pdf(path_pdf):
     # Parse the pdf
     
     try:
@@ -61,7 +61,7 @@ def get_json_text_from_pdf(path_pdf):
     
     return None
 
-def print_json_pretty(json_str):
+def _print_json_pretty(json_str):
     j = json.load(json_str)
     print(json.dumps(j, indent=4, sort_keys=True))
 
@@ -74,7 +74,7 @@ def parse_pdf_prospect(url_pdf, json_format = True):
     '''
 
     # Try to download the pdf
-    tmp_copy = download_file(url_pdf)
+    tmp_copy = _download_file(url_pdf)
     if not tmp_copy:
         raise RuntimeError
 
@@ -82,10 +82,10 @@ def parse_pdf_prospect(url_pdf, json_format = True):
         raise IOError
 
     if json_format:
-        return get_json_text_from_pdf(tmp_copy)
-    return get_raw_text_from_pdf(tmp_copy)
+        return _get_json_text_from_pdf(tmp_copy)
+    return _get_raw_text_from_pdf(tmp_copy)
 
-def tests():
+def _tests():
     example_files = [
         'https://www.aspirin.de/sites/g/files/vrxlpx15691/files/2021-03/aspirin-500mg-ueberzogene-tabletten-beipackzettel.pdf'
     ]
@@ -100,5 +100,4 @@ def tests():
 
 
 if __name__ == "__main__":
-    # main()
-    tests()
+    _tests()
