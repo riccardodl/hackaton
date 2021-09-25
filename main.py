@@ -1,8 +1,8 @@
 from flask import Flask
 from flask import request
-from .database import Database
-from .pdf_parser.pdf_parser import *
-import json
+from shared_code.database import Database
+from shared_code.pdf_parser import *
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -12,7 +12,7 @@ app = Flask(__name__)
 def get_json(barcode):
     db_handler = Database()
     data = db_handler.get_entry(barcode)
-    return data
+    return render_template('content.html')#, data=data)
 
 #HTML forms must use enctype=multipart/form-data or files will not be uploaded.
 @app.route("/put/<drug>", methods=['PUT'])

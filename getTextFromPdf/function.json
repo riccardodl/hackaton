@@ -5,9 +5,10 @@
       "authLevel": "function",
       "type": "httpTrigger",
       "direction": "in",
-      "name": "barcode",
+      "name": "req",
       "methods": [
-        "get"
+        "get",
+        "post"
       ]
     },
     {

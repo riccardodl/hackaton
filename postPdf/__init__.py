@@ -1,7 +1,9 @@
 import logging
-from shared.database import Database
-from shared.pdf_parser import *
+#from shared_code import database
+#from shared_code import pdf_parser
 import azure.functions as func
+import csv
+import os
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -15,12 +17,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
 
-    data = parse_pdf_prospect(url, False)  
+    data = pdf_parser.parse_pdf_prospect(url, False)  
     data = data.replace('\r','').replace('\n','<br />') 
 
 
-    db_handler = Database()
+    db_handler = database.Database()
     id = db_handler.get_next_id()
     db_handler.put_entry(id, drug, qr_code, data)
 
     return func.HttpResponse("OK",status_code=200)
+
+
+
