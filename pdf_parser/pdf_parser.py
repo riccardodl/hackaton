@@ -37,10 +37,8 @@ def _get_raw_text_from_pdf(path_pdf):
                 for page in range(int(pages)):
                     page_text = extractor.get_text_for_page(page)
                     print(page_text)
-                    print('0---------------------\n\n----------------------')
                     text.append(page_text)
-
-                return "\n".join(text)
+                return "\n".join(text).encode('ascii', 'ignore').decode('utf-8')
     except Exception:
         print('------>>>>>> ERROR >>>>>>-------')
 
