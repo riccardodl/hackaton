@@ -12,7 +12,7 @@ app = Flask(__name__)
 def get_json(barcode):
     db_handler = Database()
     data = db_handler.get_entry(barcode)
-    return render_template('content.html')#, data=data)
+    return render_template('content.html', longText=data)
 
 #HTML forms must use enctype=multipart/form-data or files will not be uploaded.
 @app.route("/put/<drug>", methods=['PUT'])
