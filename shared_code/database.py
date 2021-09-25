@@ -1,22 +1,23 @@
-import json
 import csv
 import os
 
-filepath = 'shared/database.csv'
 
 class Database(object):
-    def __init__(self):
-        super().__init__()
+    def __init__(self):        
+        self.filepath = 'database.csv'
 
     def get_next_id(self):
-        with open(filepath, newline='') as file:
+        if not os.path.exists(self.filepath):
+            return 0
+            
+        with open(self.filepath, newline='') as file:
             data = csv.reader(file)
             count = len(list(data))
             return count
 
 
     def get_entry(self, drug_name):
-        with open(filepath, newline='') as file:
+        with open(self.filepath, newline='') as file:
             data = csv.reader(file)
             for row in data:
                 if row[1] == drug_name:
@@ -25,8 +26,9 @@ class Database(object):
             return 'Entry not found'
 
     def put_entry(self, barcode_id, drug_name, barcode_type, json):    
-        os.unlink(filepath)    
-        with open(filepath, 'a+', newline='') as file:
+        if os.path.exists(self.filepath):
+            os.unlink(self.filepath)    
+        with open(self.filepath, 'a+', newline='') as file:
             writer = csv.writer(file)            
             writer.writerow([barcode_id,drug_name,barcode_type,json])
         return None

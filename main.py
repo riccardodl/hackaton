@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
-from .database import Database
-from .pdf_parser.pdf_parser import *
+from shared_code.database import Database
+from shared_code.pdf_parser import *
 import json
 
 app = Flask(__name__)
