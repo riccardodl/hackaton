@@ -23,8 +23,20 @@ def _download_file(download_url):
 def _get_tmp_folder():
     return tempfile.gettempdir()
 
+def _parse_text(text):
+    return text.encode('ascii', 'ignore').decode('utf-8')
 
-def _get_raw_text_from_pdf(path_pdf):
+def _is_bullet(text):
+    parts = text.split('.') 
+    if len(parts) < 2:
+        return False
+    try:
+        val = int(parts[0])
+        return True
+    except:
+        return False
+
+def _get_q_and_as_from_pdf(path_pdf):
         
     try:
         extractor = SimpleTextExtraction()
@@ -36,9 +48,35 @@ def _get_raw_text_from_pdf(path_pdf):
                 text = []
                 for page in range(int(pages)):
                     page_text = extractor.get_text_for_page(page)
-                    print(page_text)
                     text.append(page_text)
-                return "\n".join(text).encode('ascii', 'ignore').decode('utf-8')
+                all_lines = []
+                for t in text:
+                    all_lines.extend(t.split('\n'))
+                
+                
+                # find preface
+                i = 0
+                while i < len(all_lines):
+                    if '?' in all_lines[i] or _is_bullet(all_lines[i]):
+                        break
+                    i += 1
+                preface = _parse_text("\n".join(all_lines[:i]))
+                
+                # Find Q&A's
+                q_and_as = []
+                while i < len(all_lines):
+                    if '?' in all_lines[i] or _is_bullet(all_lines[i]):
+                        q_and_as.append([_parse_text(all_lines[i]), []])
+                    else:
+                        q_and_as[-1][1].append(_parse_text(all_lines[i]))
+                    i += 1
+                
+                q_and_as = [(qa[0], "\n".join(qa[1])) for qa in q_and_as]
+                return json.dumps({
+                    'preface': preface,
+                    'qs_and_as': q_and_as
+                })
+                # return _parse_text("\n".join(text))
     except Exception:
         print('------>>>>>> ERROR >>>>>>-------')
 
@@ -64,7 +102,7 @@ def _print_json_pretty(json_str):
     print(json.dumps(j, indent=4, sort_keys=True))
 
 
-def parse_pdf_prospect(url_pdf, json_format = True):
+def parse_pdf_prospect(url_pdf):
     '''
     Parses a pdf given as a filename to a json string
     :param filename: str representing a valid path
@@ -79,20 +117,20 @@ def parse_pdf_prospect(url_pdf, json_format = True):
     if not os.path.exists(tmp_copy) or os.path.isdir(tmp_copy):
         raise IOError
 
-    if json_format:
-        return _get_json_text_from_pdf(tmp_copy)
-    return _get_raw_text_from_pdf(tmp_copy)
+    return _get_q_and_as_from_pdf(tmp_copy)
 
 def _tests():
     example_files = [
         'https://www.aspirin.de/sites/g/files/vrxlpx15691/files/2021-03/aspirin-500mg-ueberzogene-tabletten-beipackzettel.pdf'
     ]
     for f in example_files:
-        d = parse_pdf_prospect(f, False)
+        d = parse_pdf_prospect(f)
         if d:
-            print(d)
-        d = parse_pdf_prospect(f, True)
-        if d:
+            obj = json.loads(d)
+            print("Preface:\n", obj['preface'])
+            for qa in obj['qs_and_as']:
+                print("Q: ", qa[0])
+                print("A: ", qa[1])
             with open('/Users/raulcatena/Desktop/ej.json', 'w') as wr:
                 wr.write(d)
 
